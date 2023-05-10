@@ -1,0 +1,8 @@
+{
+  "name": "webRTC",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/lizuncong/webrtc.git",
+  "author": "lizuncong <2900170896@qq.com>",
+  "license": "MIT"
+}
