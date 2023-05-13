@@ -8,6 +8,7 @@ const SIGNAL_TYPE_ANSWER = "answer";
 const SIGNAL_TYPE_CANDIDATE = "candidate";
 
 let localStream = null;
+let remoteStream = null;
 const localUserId = Math.random().toString(36).substring(2);
 let remoteUserId;
 
@@ -35,6 +36,15 @@ class BroadCaster {
         case SIGNAL_TYPE_PEER_LEAVE:
           this.handleRemotePeerLeave(jsonMsg);
           break;
+        case SIGNAL_TYPE_OFFER:
+          handleRemoteOffer(jsonMsg);
+          break;
+        case SIGNAL_TYPE_ANSWER:
+          handleRemoteAnswer(jsonMsg);
+          break;
+        case SIGNAL_TYPE_CANDIDATE:
+          handleRemoteCandidate(jsonMsg);
+          break;
       }
     };
     this.websocket.onerror = (e) => {
@@ -49,19 +59,130 @@ class BroadCaster {
   }
   handleRemoteNewPeer(msg) {
     console.log("有新的客户端连接进来了...", msg);
-    // createOffer();
+    createOffer();
   }
   handleRemoteRespJoin(msg) {
     console.log("加入房间成功，房间内其他成员信息：", msg);
   }
   handleRemotePeerLeave(msg) {
-    console.log('有用户离开了。。。', msg)
+    console.log("有用户离开了。。。", msg);
     remoteVideo.srcObject = null;
   }
 }
 
 const broadCaster = new BroadCaster("ws://localhost:8088");
-
+let peerConn;
+const createPeerConnection = () => {
+  const pc = new RTCPeerConnection();
+  // handleIceCandidate
+  pc.onicecandidate = (event) => {
+    const candidate = event.candidate;
+    console.log("handleIceCandidate==", candidate);
+    if (candidate) {
+      console.log("onicecandidate信息。。", candidate);
+      const jsonMsg = {
+        cmd: "candidate",
+        roomId: roomId.value,
+        uid: localUserId,
+        remoteUid: remoteUserId,
+        msg: JSON.stringify(candidate),
+      };
+      console.log("发送打洞信息...", jsonMsg);
+      broadCaster.sendMessage(jsonMsg);
+    } else {
+      console.warn("End of candidate.打洞失败");
+    }
+  };
+  // handleRemoteStreamAdd
+  pc.ontrack = (event) => {
+    console.log("ontrack...", event.streams);
+    remoteStream = event.streams[0];
+    remoteVideo.srcObject = remoteStream;
+  };
+  localStream.getTracks().forEach((track) => {
+    pc.addTrack(track, localStream);
+  });
+  return pc;
+};
+const handleRemoteOffer = (message) => {
+  console.log("handleRemoteOffer===", message);
+  if (!peerConn) {
+    peerConn = createPeerConnection();
+  }
+  const desc = JSON.parse(message.msg);
+  peerConn.setRemoteDescription(desc);
+  doAnswer();
+};
+const handleRemoteAnswer = (message) => {
+  console.log("handleRemoteAnswer=====", message);
+  const desc = JSON.parse(message.msg);
+  peerConn.setRemoteDescription(desc);
+};
+const handleRemoteCandidate = (message) => {
+  console.log("handleRemoteCandidate=====", message);
+  const candidate = JSON.parse(message.msg)
+  peerConn.addIceCandidate(candidate).catch(err => {
+    console.log('addIceCandidate fail:', err)
+  })
+};
+const doAnswer = () => {
+  peerConn
+    .createAnswer()
+    .then((session) => {
+      console.log("createAnswer.....", session);
+      // createAnswerAndSendMessage
+      peerConn
+        .setLocalDescription(session)
+        .then(() => {
+          const jsonMsg = {
+            cmd: "answer",
+            roomId: roomId.value,
+            uid: localUserId,
+            remoteUid: remoteUserId,
+            msg: JSON.stringify(session),
+          };
+          console.log("发送answer到远端...", jsonMsg);
+          broadCaster.sendMessage(jsonMsg);
+        })
+        .catch((err) => {
+          console.error("answer setLocalDescription failed:", err);
+        });
+    })
+    .catch((err) => {
+      console.error("createAnswer failed:", err);
+    });
+};
+const createOffer = () => {
+  // 创建RTCPeerConnection
+  if (!peerConn) {
+    peerConn = createPeerConnection();
+  }
+  peerConn
+    .createOffer()
+    .then((session) => {
+      console.log("createOffer.....", session);
+      // createOfferAndSendMessage
+      peerConn
+        .setLocalDescription(session)
+        .then(() => {
+          const jsonMsg = {
+            cmd: "offer",
+            roomId: roomId.value,
+            uid: localUserId,
+            remoteUid: remoteUserId,
+            msg: JSON.stringify(session),
+          };
+          console.log("发送offer到远端...", jsonMsg);
+          broadCaster.sendMessage(jsonMsg);
+        })
+        .catch((err) => {
+          console.error("offer setLocalDescription failed:", err);
+        });
+    })
+    .catch((err) => {
+      console.error("createOffer failed:", err);
+    });
+};
 const doJoin = (roomId) => {
   const jsonMsg = {
     cmd: "join",
