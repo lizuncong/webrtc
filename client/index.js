@@ -32,6 +32,9 @@ class BroadCaster {
         case SIGNAL_TYPE_RESP_JOIN:
           this.handleRemoteRespJoin(jsonMsg);
           break;
+        case SIGNAL_TYPE_PEER_LEAVE:
+          this.handleRemotePeerLeave(jsonMsg);
+          break;
       }
     };
     this.websocket.onerror = (e) => {
@@ -49,7 +52,11 @@ class BroadCaster {
     // createOffer();
   }
   handleRemoteRespJoin(msg) {
-    console.log('加入房间成功，房间内其他成员信息：', msg)
+    console.log("加入房间成功，房间内其他成员信息：", msg);
+  }
+  handleRemotePeerLeave(msg) {
+    console.log('有用户离开了。。。', msg)
+    remoteVideo.srcObject = null;
   }
 }
 
@@ -85,4 +92,13 @@ joinBtn.onclick = () => {
     .catch((e) => {
       console.error("获取本地码流失败：", e);
     });
+};
+
+leaveBtn.onclick = () => {
+  const jsonMsg = {
+    cmd: SIGNAL_TYPE_LEAVE,
+    roomId: roomId.value,
+    uid: localUserId,
+  };
+  broadCaster.sendMessage(jsonMsg);
 };

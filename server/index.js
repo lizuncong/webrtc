@@ -48,6 +48,30 @@ const handleJoin = (message, conn) => {
   }
 };
 
+const handleLeave = (message) => {
+  const { roomId, uid } = message;
+  console.log("uid:", uid, " leave room:", roomId);
+  const room = roomMap[roomId];
+  if (!room) {
+    console.log("handle leave 没找到roomId ", roomId);
+    return;
+  }
+  delete room[uid];
+  const restUids = Object.keys(room);
+  // 将离开的用户信息广播给房间内的其他人
+  if (restUids.length) {
+    restUids.forEach((remoteUid) => {
+      const jsonMsg = {
+        cmd: SIGNAL_TYPE_PEER_LEAVE,
+        remoteUid: uid,
+      };
+      const conn = room[remoteUid];
+      console.log('将离开的用户信息广播给房间内的其他人', jsonMsg)
+      conn && conn.sendText(JSON.stringify(jsonMsg));
+    });
+  }
+};
+
 const server = ws
   .createServer((conn) => {
     console.log("创建一个新的连接========");
@@ -58,6 +82,9 @@ const server = ws
       switch (jsonMsg.cmd) {
         case SIGNAL_TYPE_JOIN:
           handleJoin(jsonMsg, conn);
+          break;
+        case SIGNAL_TYPE_LEAVE:
+          handleLeave(jsonMsg);
           break;
         default:
           console.error("无法识别的指令");
