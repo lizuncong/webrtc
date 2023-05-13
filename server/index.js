@@ -66,11 +66,71 @@ const handleLeave = (message) => {
         remoteUid: uid,
       };
       const conn = room[remoteUid];
-      console.log('将离开的用户信息广播给房间内的其他人', jsonMsg)
+      console.log("将离开的用户信息广播给房间内的其他人", jsonMsg);
       conn && conn.sendText(JSON.stringify(jsonMsg));
     });
   }
 };
+
+const handleOffer = (message) => {
+  const { roomId, uid, remoteUid } = message;
+  console.log("uid:", uid, " handle Offer:", roomId, remoteUid);
+  const room = roomMap[roomId];
+  if (!room) {
+    console.log("handle offer 没找到roomId ", roomId);
+    return;
+  }
+  if(!room[uid]){
+    console.log('handle offer 没找到用户:', uid)
+    return
+  }
+  const remoteConn = room[remoteUid];
+  if(remoteConn){
+    remoteConn.sendText(JSON.stringify(message))
+  } else{
+    console.error('handle offer没找到 remote uid:', remoteUid)
+  }
+}
+
+const handleAnswer = (message) => {
+  const { roomId, uid, remoteUid } = message;
+  console.log("uid:", uid, " handle answer:", roomId);
+  const room = roomMap[roomId];
+  if (!room) {
+    console.log("handle answer 没找到roomId ", roomId);
+    return;
+  }
+  if(!room[uid]){
+    console.log('handle answer 没找到用户:', uid)
+    return
+  }
+  const remoteConn = room[remoteUid];
+  if(remoteConn){
+    remoteConn.sendText(JSON.stringify(message))
+  } else{
+    console.error('handle answerr没找到 remote uid:', remoteUid)
+  }
+}
+
+const handleCandidate = (message) => {
+  const { roomId, uid, remoteUid } = message;
+  console.log("uid:", uid, " handle candidate:", roomId);
+  const room = roomMap[roomId];
+  if (!room) {
+    console.log("handle candidate 没找到roomId ", roomId);
+    return;
+  }
+  if(!room[uid]){
+    console.log('handle candidate 没找到用户:', uid)
+    return
+  }
+  const remoteConn = room[remoteUid];
+  if(remoteConn){
+    remoteConn.sendText(JSON.stringify(message))
+  } else{
+    console.error('handle candidate没找到 remote uid:', remoteUid)
+  }
+}
 
 const server = ws
   .createServer((conn) => {
@@ -85,6 +145,15 @@ const server = ws
           break;
         case SIGNAL_TYPE_LEAVE:
           handleLeave(jsonMsg);
+          break;
+        case SIGNAL_TYPE_OFFER:
+          handleOffer(jsonMsg);
+          break;
+        case SIGNAL_TYPE_ANSWER:
+          handleAnswer(jsonMsg);
+          break;
+        case SIGNAL_TYPE_CANDIDATE:
+          handleCandidate(jsonMsg);
           break;
         default:
           console.error("无法识别的指令");

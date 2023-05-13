@@ -59,9 +59,11 @@ class BroadCaster {
   }
   handleRemoteNewPeer(msg) {
     console.log("有新的客户端连接进来了...", msg);
+    remoteUserId = msg.remoteUid
     createOffer();
   }
   handleRemoteRespJoin(msg) {
+    remoteUserId = msg.remoteUid
     console.log("加入房间成功，房间内其他成员信息：", msg);
   }
   handleRemotePeerLeave(msg) {
