@@ -59,23 +59,53 @@ class BroadCaster {
   }
   handleRemoteNewPeer(msg) {
     console.log("有新的客户端连接进来了...", msg);
-    remoteUserId = msg.remoteUid
+    remoteUserId = msg.remoteUid;
     createOffer();
   }
   handleRemoteRespJoin(msg) {
-    remoteUserId = msg.remoteUid
+    remoteUserId = msg.remoteUid;
     console.log("加入房间成功，房间内其他成员信息：", msg);
   }
   handleRemotePeerLeave(msg) {
     console.log("有用户离开了。。。", msg);
     remoteVideo.srcObject = null;
+    if (peerConn) {
+      peerConn.close();
+      peerConn = null;
+    }
   }
 }
 
 const broadCaster = new BroadCaster("ws://localhost:8088");
 let peerConn;
 const createPeerConnection = () => {
-  const pc = new RTCPeerConnection();
+  const defaultConfiguration = {
+    bundlePolicy: "max-bundle",
+    rtcpMuxPolicy: "require",
+    iceTransportPolicy: "relay", // 先设置为relay，只有relay中继模式可用的时候，才能部署到公网。部署到公网后也先测试relay
+    iceServers: [
+      {
+        urls: [
+          "turn:192.168.221.134:3478?transport=udp",
+          "turn:192.168.221.134:3478?transport=tcp",
+        ],
+        username: "lqf",
+        credential: "123456",
+      },
+      {
+        urls: ["stun:192.168.221.134:3478"],
+      },
+    ],
+    // iceServers: [
+    //   {
+    //     urls: [
+    //       "stun:stun.l.google.com:19302",
+    //       "stun:global.stun.twilio.com:3478",
+    //     ],
+    //   },
+    // ],
+  };
+  const pc = new RTCPeerConnection(defaultConfiguration);
   // handleIceCandidate
   pc.onicecandidate = (event) => {
     const candidate = event.candidate;
@@ -101,6 +131,12 @@ const createPeerConnection = () => {
     remoteStream = event.streams[0];
     remoteVideo.srcObject = remoteStream;
   };
+  pc.onconnectionstatechange = () => {
+    console.log('onconnectionstatechange..', pc.connectionState)
+  };
+  pc.oniceconnectionstatechange = () => {
+    console.log('oniceconnectionstatechange.', pc.iceConnectionState)
+  };
   localStream.getTracks().forEach((track) => {
     pc.addTrack(track, localStream);
   });
@@ -122,10 +158,10 @@ const handleRemoteAnswer = (message) => {
 };
 const handleRemoteCandidate = (message) => {
   console.log("handleRemoteCandidate=====", message);
-  const candidate = JSON.parse(message.msg)
-  peerConn.addIceCandidate(candidate).catch(err => {
-    console.log('addIceCandidate fail:', err)
-  })
+  const candidate = JSON.parse(message.msg);
+  peerConn.addIceCandidate(candidate).catch((err) => {
+    console.log("addIceCandidate fail:", err);
+  });
 };
 const doAnswer = () => {
   peerConn
@@ -224,4 +260,24 @@ leaveBtn.onclick = () => {
     uid: localUserId,
   };
   broadCaster.sendMessage(jsonMsg);
+
+  hangup();
+};
+
+const hangup = () => {
+  localVideo.srcObject = null;
+  remoteVideo.srcObject = null;
+  closeLocalStream();
+  if (peerConn) {
+    peerConn.close();
+    peerConn = null;
+  }
+};
+
+const closeLocalStream = () => {
+  if (localStream) {
+    localStream.getTracks().forEach((track) => {
+      track.stop();
+    });
+  }
 };
