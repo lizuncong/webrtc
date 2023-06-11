@@ -88,7 +88,11 @@ offerBtn.onclick = () => {
       console.log("data channel连接关闭", event);
     };
   };
-  peer.setRemoteDescription(offser);
+  peer.setRemoteDescription(offser).then(res => {
+    console.log('设置offer成功')
+  }).catch(err => {
+    comsole.log('设置offer失败...', err)
+  });
 
   const candidate = JSON.parse(icecandidateTxt.value);
   peer
@@ -124,13 +128,13 @@ offerBtn.onclick = () => {
 answerBtn.onclick = () => {
   const answer = JSON.parse(answerTxt.value);
   peer.setRemoteDescription(answer).then((res) => {
-    console.log("设置远程描述成功....", res);
+    console.log("设置answer描述成功....", res);
   });
   const candidate = JSON.parse(icecandidateTxt.value);
   peer
     .addIceCandidate(candidate)
     .then((res) => {
-      console.log("添加候选人成功...", res);
+      console.log("添加candidate成功...", res);
     })
     .catch((err) => {
       console.log("addIceCandidate 错误", err);
