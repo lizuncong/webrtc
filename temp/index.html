@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <title>WebRTC DEMO</title>
+    <style>
+        textarea {
+            width: 100%;
+            height: 150px;
+        }
+
+        button {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>WebRTC DEMO</div>
+    <div>
+        <button id="initialBtn">发起webrtc连接</button>
+        <button id="sendBtn">通过data channel发送消息</button>
+    </div>
+    <div>
+        <textarea id="offserTxt" placeholder="请输入offer" type="text"></textarea>
+        <button id="offerBtn">确认offer</button>
+    </div>
+    <div>
+        <textarea id="answerTxt" placeholder="请输入Answer" type="text"></textarea>
+        <button id="answerBtn">确认Answer</button>
+    </div>
+    <textarea id="localIcecandidateTxt"></textarea>
+    <div>
+        <textarea id="icecandidateTxt" placeholder="请输入ice candidate" type="text"></textarea>
+        <button id="icecandidateBtn">确认ice Candidate</button>
+    </div>
+    <script src="./index.js"></script>
+</body>
+
+</html>
