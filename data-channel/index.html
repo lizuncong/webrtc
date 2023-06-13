@@ -28,7 +28,7 @@
 
 <body>
     <div>WebRTC DEMO</div>
-    <div>
+    <div id="initior">
         发起端：<button id="initialBtn">发起webrtc连接</button><button id="sendBtn">通过data channel发送消息</button>
         <div>
             <textarea id="localOffer" placeholder="发起端offer，只读" type="text"></textarea>
@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <div>
+    <div id="receiver">
         接收端：
         <div>
             <textarea id="recevieAnswer" placeholder="接收端answer，只读" type="text"></textarea>

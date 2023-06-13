@@ -1,3 +1,8 @@
+if (location.search.includes("isReceive")) {
+  initior.style.display = "none";
+} else {
+  receiver.style.display = "none";
+}
 let localConnection;
 let remoteConnection;
 let localCandidates = [];
@@ -13,8 +18,11 @@ initialBtn.onclick = async () => {
   sendChannel.onclose = (event) => {
     console.log("send channel close======", event);
   };
+  sendChannel.onmessage = event => {
+    console.log('接收到消息..', event.data)
+  }
   localConnection.onicecandidate = (e) => {
-    console.log("local on icecandidate=====", e);
+    console.log("local on icecandidate=====", e.candidate);
     if (e.candidate) {
       localCandidates.push(e.candidate);
       localCandidate.value = JSON.stringify(localCandidates);
@@ -45,17 +53,18 @@ confirmOffer.onclick = async () => {
     console.log("on data channel=====", e);
     receiveChannel = event.channel;
     receiveChannel.onmessage = (e) => {
-      console.log('接收到消息。。。。', e)
+      console.log("接收到消息。。。。", e.data);
+      receiveChannel.send('接收到消息')
     };
     receiveChannel.onopen = (e) => {
-      console.log('data channel 打开。。', e)
+      console.log("data channel 打开。。", e);
     };
     receiveChannel.onclose = (e) => {
-      console.log('data channel 关闭。。。', e)
+      console.log("data channel 关闭。。。", e);
     };
   };
   remoteConnection.onicecandidate = (e) => {
-    console.log("remote on icecandidate=======", e);
+    console.log("remote on icecandidate=======", e.candidate);
     if (e.candidate) {
       remoteCandidates.push(e.candidate);
       receiveCandidate.value = JSON.stringify(remoteCandidates);
@@ -70,5 +79,5 @@ confirmOffer.onclick = async () => {
 };
 
 sendBtn.onclick = () => {
-  sendChannel.send('hello world')
+  sendChannel.send("hello world");
 };
