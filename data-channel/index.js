@@ -1,3 +1,16 @@
+const defaultConfiguration = {
+  // bundlePolicy: "max-bundle",
+  // rtcpMuxPolicy: "require",
+  // iceTransportPolicy: "relay", // 先设置为relay，只有relay中继模式可用的时候，才能部署到公网。部署到公网后也先测试relay
+  iceServers: [
+    {
+      urls: [
+        "stun:stun.l.google.com:19302",
+        "stun:global.stun.twilio.com:3478",
+      ],
+    },
+  ],
+};
 if (location.search.includes("isReceive")) {
   initior.style.display = "none";
 } else {
@@ -10,7 +23,7 @@ let remoteCandidates = [];
 let sendChannel;
 let receiveChannel;
 initialBtn.onclick = async () => {
-  localConnection = new RTCPeerConnection();
+  localConnection = new RTCPeerConnection(defaultConfiguration);
   sendChannel = localConnection.createDataChannel("sendChannel");
   sendChannel.onopen = (event) => {
     console.log("send channel open=====", event, sendChannel);
@@ -29,7 +42,9 @@ initialBtn.onclick = async () => {
     }
   };
   const offer = await localConnection.createOffer();
+  console.log('local offer=====', offer)
   const res = await localConnection.setLocalDescription(offer);
+  console.log('set local desc...', res)
   localOffer.value = JSON.stringify(offer);
 };
 confirmAnswer.onclick = async () => {
@@ -48,7 +63,7 @@ confirmLocalCandidate.onclick = async () => {
   });
 };
 confirmOffer.onclick = async () => {
-  remoteConnection = new RTCPeerConnection();
+  remoteConnection = new RTCPeerConnection(defaultConfiguration);
   remoteConnection.ondatachannel = (e) => {
     console.log("on data channel=====", e);
     receiveChannel = event.channel;
@@ -74,7 +89,9 @@ confirmOffer.onclick = async () => {
     JSON.parse(initialOffer.value)
   );
   const answer = await remoteConnection.createAnswer();
+  console.log('answer....', answer)
   const res2 = await remoteConnection.setLocalDescription(answer);
+  console.log('set answer...', res2)
   recevieAnswer.value = JSON.stringify(answer);
 };
 
