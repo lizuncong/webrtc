@@ -1,0 +1,8 @@
+
+ICE（Interactive Connectivity Establishment）是一种用于建立对等连接（peer-to-peer）网络的标准协议，主要用于WebRTC和P2P网络互联的场景中。在WebRTC中，ICE协议用于建立网络连接并传输媒体流，通过收集ICE candidates以及通过STUN和TURN服务器实现NAT（网络地址转换）穿透，避免网络传输中的延迟、丢包等问题。
+
+ICE candidate即ICE协议中使用的候选者信息，它包含了候选者的网络接口IP地址和端口等信息，ICE协议通过收集ICE candidates从而在双方之间建立实时传输的媒体流。在WebRTC连接中，通过交换ICE candidates的信息，来选择建立最佳的连接路径，从而实现P2P的媒体流传输。
+
+WebRTC中的ICE候选者主要分为两类：主机候选者和服务器候选者。主机候选者由本地的网络接口建立，在本地网络中可能有公网和私网两个IP，用于建立点对点直接的连接，而服务器候选者是通过STUN和TURN服务器收集的公网IP地址和端口等信息，用于实现跨域通信。
+
+通过收集ICE candidates并选择最佳路径进行连接，WebRTC能够在各种网络环境下实现实时音视频通信。
