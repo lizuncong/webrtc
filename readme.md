@@ -9,3 +9,5 @@
 - [P2P 技术之 STUN、TURN、ICE 详解](https://www.jianshu.com/p/258e7d8be2ba)
 - [详解 P2P 技术中的 NAT 穿透原理](https://www.jianshu.com/p/f71707892eb2)
 - [webRTC指南](https://webrtc.org/?hl=zh-cn)
+- [https://www.zhihu.com/question/58831390](https://www.zhihu.com/question/58831390)
+- [http://c.biancheng.net/view/6nop6z.html](http://c.biancheng.net/view/6nop6z.html)

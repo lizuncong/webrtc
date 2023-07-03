@@ -24,6 +24,7 @@ let sendChannel;
 let receiveChannel;
 initialBtn.onclick = async () => {
   localConnection = new RTCPeerConnection(defaultConfiguration);
+  window.__localConnection = localConnection
   sendChannel = localConnection.createDataChannel("sendChannel");
   sendChannel.onopen = (event) => {
     console.log("send channel open=====", event, sendChannel);
@@ -40,6 +41,10 @@ initialBtn.onclick = async () => {
       localCandidates.push(e.candidate);
       localCandidate.value = JSON.stringify(localCandidates);
     }
+  };
+  localConnection.oniceconnectionstatechange = (e) => {
+    console.log("local  oniceconnectionstatechange=====", e);
+   
   };
   const offer = await localConnection.createOffer();
   console.log('local offer=====', offer)
@@ -64,6 +69,8 @@ confirmLocalCandidate.onclick = async () => {
 };
 confirmOffer.onclick = async () => {
   remoteConnection = new RTCPeerConnection(defaultConfiguration);
+  window.__remoteConnection = remoteConnection
+
   remoteConnection.ondatachannel = (e) => {
     console.log("on data channel=====", e);
     receiveChannel = event.channel;
