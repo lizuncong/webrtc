@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>文件大小</title>
+    <script src="./mini_zip.js"></script>
+</head>
+
+<body>
+    <div>
+        <input id="uploadInput" type="file" multiple />
+    </div>
+
+    <script>
+        const uploadInput = document.getElementById("uploadInput");
+        uploadInput.addEventListener(
+            "change",
+            () => {
+                const file = uploadInput.files[0]
+                load(file)
+            },
+            false
+        );
+    </script>
+</body>
+
+</html>

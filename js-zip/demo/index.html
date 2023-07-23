@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>文件大小</title>
+    <script src="./zip.js"></script>
+</head>
+
+<body>
+    <div>
+        <input id="uploadInput" type="file" multiple />
+    </div>
+
+    <script>
+        const uploadInput = document.getElementById("uploadInput");
+        uploadInput.addEventListener(
+            "change",
+            () => {
+                const file = uploadInput.files[0]
+                console.log('file....', file)
+                debugger
+                JSZip.loadAsync(file)
+                    .then(function (zip) {
+                        // 遍历 ZIP 文件中的所有文件
+                        // zip.forEach(function (relativePath, zipEntry) {
+                        //     // 提取文件内容
+                        //     zipEntry.async('string').then(function (fileData) {
+                        //         console.log('文件名:', relativePath);
+                        //         console.log('文件内容:', fileData);
+                        //     });
+                        // });
+                        console.log('zip....', zip)
+                    })
+                    .catch(function (error) {
+                        console.error('解压缩失败:', error);
+                    });
+
+            },
+            false
+        );
+    </script>
+</body>
+
+</html>
