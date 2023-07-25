@@ -5,11 +5,13 @@
     <meta charset="UTF-8" />
     <title>文件大小</title>
     <script src="./zip.js"></script>
+    <script src="./filesaver.js"></script>
 </head>
 
 <body>
     <div>
         <input id="uploadInput" type="file" multiple />
+        <button id="btn">生成zip</button>
     </div>
 
     <script>
@@ -19,7 +21,7 @@
             () => {
                 const file = uploadInput.files[0]
                 console.log('file....', file)
-                debugger
+                // debugger
                 JSZip.loadAsync(file)
                     .then(function (zip) {
                         // 遍历 ZIP 文件中的所有文件
@@ -39,6 +41,19 @@
             },
             false
         );
+
+        btn.onclick = () => {
+            var zip = new JSZip();
+            zip.file("Hello.txt", "Hello World\n");
+            var img = zip.folder("images");
+            img.file("my.txt", "hello");
+            zip.generateAsync({ type: "blob" })
+                .then(function (content) {
+                    console.log('zip====', content)
+                    // see FileSaver.js
+                    saveAs(content, "example.zip");
+                });
+        }
     </script>
 </body>
 
