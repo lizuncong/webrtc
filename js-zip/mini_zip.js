@@ -36,12 +36,13 @@ const readFile = (file) => {
 
 const load = async (file) => {
     const result = await readFile(file)
-    console.log('arrayBuff...', result.arrayBuff)
-    console.log('binaryString...', result.binaryString)
-    console.log('dataURL...', result.dataURL)
-    console.log('text...', result.text)
+    // console.log('arrayBuff...', result.arrayBuff)
+    // console.log('binaryString...', result.binaryString)
+    // console.log('dataURL...', result.dataURL)
+    // console.log('text...', result.text)
 
-    // const uint8arr = new Uint8Array(arrayBuff)
+    const uint8arr = new Uint8Array(result.arrayBuff)
+    console.log(uint8arr)
     // console.log('uint8arr===', uint8arr)
     // const length = uint8arr.length
     // for (var i = 0; i < length; i++) {

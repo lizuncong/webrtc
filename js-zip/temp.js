@@ -72,3 +72,33 @@ const img = {
     },
     root: "images/"
 }
+
+const generateInternalStream = () => {
+    const opts = {
+        comment: null,
+        compression: "STORE",
+        compressionOptions: null,
+        encodeFileName: (str) => {
+            if (support.nodebuffer) {
+                return nodejsUtils.newBufferFrom(str, "utf-8");
+            }
+
+            return string2buf(str);
+        },
+        mimeType: "application/zip",
+        platform: "DOS",
+        streamFiles: false,
+        type: "blob"
+    }
+}
+
+const string2buf = (str) => {
+
+}
+
+const chunk = {
+    data: "Hello World\n",
+    meta: {
+        percent: 100
+    }
+}
